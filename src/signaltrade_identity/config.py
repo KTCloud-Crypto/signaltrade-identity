@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6379/0"
     secret_key: str = "change-me"
     master_encryption_key: str = ""
+    internal_service_token: str = ""
     telegram_chat_id: str = ""
     telegram_bot_token: str = ""
     telegram_bot_username: str = ""

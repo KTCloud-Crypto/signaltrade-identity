@@ -7,7 +7,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.responses import Response
 
 from signaltrade_identity.api_auth import router as auth_router
-from signaltrade_identity.api_internal import auth_router as internal_auth_router, router as internal_router
+from signaltrade_identity.api_internal import (
+    auth_router as internal_auth_router,
+    credentials_router as internal_credentials_router,
+    router as internal_router,
+)
 from signaltrade_identity.api_users import router as users_router
 from signaltrade_identity.config import settings
 from signaltrade_identity.database import SessionLocal
@@ -23,6 +27,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(internal_router)
 app.include_router(internal_auth_router)
+app.include_router(internal_credentials_router)
 
 
 @app.get("/health", tags=["system"])
