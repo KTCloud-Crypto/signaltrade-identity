@@ -1,0 +1,2 @@
+"""SignalTrade Identity service."""
+
