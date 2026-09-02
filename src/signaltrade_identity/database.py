@@ -1,10 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from signaltrade_identity.config import settings
 
 _options = (
-    {"connect_args": {"check_same_thread": False}}
+    {"connect_args": {"check_same_thread": False}, "poolclass": StaticPool}
     if settings.database_url.startswith("sqlite")
     else {}
 )
@@ -19,4 +20,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
