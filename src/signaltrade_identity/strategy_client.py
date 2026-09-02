@@ -9,6 +9,7 @@ def disable_live_subscriptions(user_id: int) -> None:
     try:
         response = httpx.post(
             f"{settings.strategy_service_url.rstrip('/')}/internal/strategy/users/{user_id}/disable-live-subscriptions",
+            headers={"X-SignalTrade-Service-Token": settings.internal_service_token},
             timeout=settings.identity_service_timeout_seconds,
         )
         response.raise_for_status()
