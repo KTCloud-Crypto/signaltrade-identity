@@ -10,6 +10,7 @@ def has_open_positions(user_id: int) -> bool:
     try:
         response = httpx.get(
             f"{settings.portfolio_service_url.rstrip('/')}/internal/portfolio/users/{user_id}/open-positions",
+            headers={"X-SignalTrade-Service-Token": settings.internal_service_token},
             timeout=settings.identity_service_timeout_seconds,
         )
         response.raise_for_status()
