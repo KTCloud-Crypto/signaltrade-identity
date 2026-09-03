@@ -21,8 +21,6 @@ auth_router = APIRouter(prefix="/internal/auth", tags=["Identity Internal"])
 credentials_router = APIRouter(
     prefix="/internal/exchange-credentials", tags=["Identity Internal"]
 )
-
-
 def require_internal_service_token(
     service_token: str | None = Header(default=None, alias="X-SignalTrade-Service-Token"),
 ) -> None:
@@ -32,6 +30,13 @@ def require_internal_service_token(
                             detail="유효한 내부 서비스 토큰이 필요합니다.")
 
 
+# Defined after the dependency function so FastAPI can bind it normally.
+telegram_users_router = APIRouter(
+    prefix="/internal/telegram-users", tags=["Identity Internal"],
+    dependencies=[Depends(require_internal_service_token)],
+)
+
+
 class TelegramLinkRequest(BaseModel):
     code: str
     chat_id: str
@@ -39,6 +44,20 @@ class TelegramLinkRequest(BaseModel):
 
 class TelegramLinkResponse(BaseModel):
     linked: bool
+
+
+class TelegramUserResponse(BaseModel):
+    id: int
+    username: str
+
+
+@telegram_users_router.get("/{chat_id}", response_model=TelegramUserResponse)
+def get_telegram_user(chat_id: str, db: Session = Depends(get_db)) -> TelegramUserResponse:
+    user = db.query(User).filter(User.telegram_chat_id == chat_id).one_or_none()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="연결된 SignalTrade 계정이 없습니다.")
+    return TelegramUserResponse(id=user.id, username=user.username)
 
 
 @router.post("", response_model=TelegramLinkResponse)
