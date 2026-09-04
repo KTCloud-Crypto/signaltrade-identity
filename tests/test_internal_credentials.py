@@ -4,11 +4,15 @@ from signaltrade_identity.config import settings
 from signaltrade_identity.database import SessionLocal
 from signaltrade_identity.main import app
 from signaltrade_identity.models.api_key import ApiKey
+from signaltrade_identity.models.user import User
 
 
 def test_internal_credentials_require_token_and_return_decrypted_values(monkeypatch):
     monkeypatch.setattr(settings, "internal_service_token", "runtime-token")
     with SessionLocal() as db:
+        db.add(User(id=7, username="internal-user", password="hashed",
+                    nickname="Internal User"))
+        db.flush()
         db.add(ApiKey(user_id=7, encrypted_access_key="encrypted-a",
                       encrypted_secret_key="encrypted-s"))
         db.commit()
