@@ -16,7 +16,6 @@ from signaltrade_identity.dependencies import get_current_user
 from signaltrade_identity.models.user import User
 
 
-router = APIRouter(prefix="/internal/telegram-links", tags=["Identity Internal"])
 auth_router = APIRouter(prefix="/internal/auth", tags=["Identity Internal"])
 credentials_router = APIRouter(
     prefix="/internal/exchange-credentials", tags=["Identity Internal"]
@@ -31,6 +30,10 @@ def require_internal_service_token(
 
 
 # Defined after the dependency function so FastAPI can bind it normally.
+router = APIRouter(
+    prefix="/internal/telegram-links", tags=["Identity Internal"],
+    dependencies=[Depends(require_internal_service_token)],
+)
 telegram_users_router = APIRouter(
     prefix="/internal/telegram-users", tags=["Identity Internal"],
     dependencies=[Depends(require_internal_service_token)],
