@@ -7,7 +7,7 @@ from signaltrade_identity.config import settings
 _options = (
     {"connect_args": {"check_same_thread": False}, "poolclass": StaticPool}
     if settings.database_url.startswith("sqlite")
-    else {}
+    else {"connect_args": {"connect_timeout": 3}}
 )
 engine = create_engine(settings.database_url, **_options)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
