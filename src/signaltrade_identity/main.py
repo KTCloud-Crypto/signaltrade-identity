@@ -40,9 +40,9 @@ def health() -> dict[str, str]:
 @app.get("/ready", tags=["system"])
 def ready() -> dict[str, str]:
     try:
+        identity_security_state.ping()
         with SessionLocal() as db:
             db.execute(text("SELECT 1"))
-        identity_security_state.ping()
     except (SQLAlchemyError, RedisError) as error:
         raise HTTPException(status_code=503, detail="dependency unavailable") from error
     return {"status": "ready"}
