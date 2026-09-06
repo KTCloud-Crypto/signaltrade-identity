@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+from redis.exceptions import ConnectionError
 
 from signaltrade_identity.main import app
 
@@ -17,3 +18,14 @@ def test_ready(monkeypatch) -> None:
     response = client.get("/ready")
     assert response.status_code == 200
     assert response.json() == {"status": "ready"}
+
+
+def test_ready_returns_503_when_redis_is_unavailable(monkeypatch) -> None:
+    def unavailable() -> bool:
+        raise ConnectionError("redis unavailable")
+
+    monkeypatch.setattr("signaltrade_identity.main.identity_security_state.ping", unavailable)
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "dependency unavailable"}
