@@ -7,6 +7,8 @@ from threading import Lock
 from typing import Any, Protocol
 
 from redis import Redis
+from redis.backoff import NoBackoff
+from redis.retry import Retry
 
 from signaltrade_identity.config import settings
 
@@ -44,6 +46,7 @@ class RedisSecurityState:
                 decode_responses=True,
                 socket_connect_timeout=2,
                 socket_timeout=2,
+                retry=Retry(NoBackoff(), 0),
             )
         )
 
