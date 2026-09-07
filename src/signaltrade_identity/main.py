@@ -17,6 +17,7 @@ from signaltrade_identity.api_users import router as users_router
 from signaltrade_identity.config import settings
 from signaltrade_identity.database import SessionLocal
 from signaltrade_identity.redis_state import identity_security_state
+from signaltrade_identity.telemetry import instrument_http
 
 app = FastAPI(
     title="SignalTrade Identity API",
@@ -24,6 +25,7 @@ app = FastAPI(
     docs_url=None if settings.is_production else "/docs",
 )
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_list)
+instrument_http(app)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(internal_router)
