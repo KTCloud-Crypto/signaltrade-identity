@@ -29,3 +29,12 @@ def test_ready_returns_503_when_redis_is_unavailable(monkeypatch) -> None:
 
     assert response.status_code == 503
     assert response.json() == {"detail": "dependency unavailable"}
+
+
+def test_metrics_are_exposed_without_unbounded_route_labels() -> None:
+    client.get("/does-not-exist/12345")
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert "signaltrade_http_requests_total" in response.text
+    assert 'route="unmatched"' in response.text
+    assert "/does-not-exist/12345" not in response.text
