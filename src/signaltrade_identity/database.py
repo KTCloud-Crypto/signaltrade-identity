@@ -3,6 +3,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from signaltrade_identity.config import settings
+from signaltrade_identity.telemetry import instrument_db_pool
 
 _options = (
     {"connect_args": {"check_same_thread": False}, "poolclass": StaticPool}
@@ -10,6 +11,7 @@ _options = (
     else {"connect_args": {"connect_timeout": 3}}
 )
 engine = create_engine(settings.database_url, **_options)
+instrument_db_pool(engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
