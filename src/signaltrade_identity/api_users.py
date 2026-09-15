@@ -258,9 +258,13 @@ def account_status(
             api_key_status_message="등록된 Upbit API Key가 없습니다.",
         )
 
+    registered_at = api_key.created_at
     checked_at = datetime.utcnow()
     try:
         access_key, secret_key = resolve_exchange_credentials(api_key)
+        # Upbit validation is a network call; do not keep the preceding read
+        # transaction and its PostgreSQL connection checked out while waiting.
+        db.close()
         validation = validate_upbit_api_key(
             access_key,
             secret_key,
@@ -274,7 +278,7 @@ def account_status(
 
     return AccountStatusOut(
         api_key_registered=True,
-        api_key_registered_at=api_key.created_at,
+        api_key_registered_at=registered_at,
         api_key_valid=valid,
         api_key_status_message=message,
         api_key_checked_at=checked_at,
