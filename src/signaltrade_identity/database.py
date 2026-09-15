@@ -8,7 +8,13 @@ from signaltrade_identity.telemetry import instrument_db_pool
 _options = (
     {"connect_args": {"check_same_thread": False}, "poolclass": StaticPool}
     if settings.database_url.startswith("sqlite")
-    else {"connect_args": {"connect_timeout": 3}}
+    else {
+        "connect_args": {"connect_timeout": 3},
+        "pool_size": 2,
+        "max_overflow": 1,
+        "pool_timeout": 5,
+        "pool_pre_ping": True,
+    }
 )
 engine = create_engine(settings.database_url, **_options)
 instrument_db_pool(engine)
